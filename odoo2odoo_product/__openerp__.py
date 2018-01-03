@@ -12,10 +12,16 @@
     "application": False,
     "installable": True,
     "depends": [
-        "odoo2odoo_backend",
         "product",
+        "connector_base_product",
+        "odoo2odoo_ir",
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/product_uom_categ.xml",
+        "views/product_uom.xml",
+        "views/product_category.xml",
+        "views/product_template.xml",
+        "views/product_product.xml",
     ],
 }

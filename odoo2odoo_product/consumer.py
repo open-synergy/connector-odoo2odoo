@@ -18,11 +18,26 @@ from openerp.addons.odoo2odoo_backend.unit.export_synchronizer import (
 from openerp.addons.odoo2odoo_backend.backend import odoo
 
 
+# Data models to synchronize (with their binding model)
 BINDINGS = OrderedDict([
+    ('product.uom.categ', 'odoo.product.uom.categ'),
+    ('product.uom', 'odoo.product.uom'),
     ('product.category', 'odoo.product.category'),
     ('product.template', 'odoo.product.template'),
     ('product.product', 'odoo.product.product'),
 ])
+
+# Data models which trigger the synchronization
+TRIGGER_ON = [
+    'product.uom.categ',
+    'product.uom',
+    'product.category',
+    'product.template',
+    'product.product',
+]
+TRIGGERS = OrderedDict(
+    [(key, value) for key, value in BINDINGS.iteritems()
+     if key in TRIGGER_ON])
 
 
 @on_record_create(model_names=BINDINGS.keys())
@@ -31,14 +46,14 @@ def on_event_create_bindings(session, model_name, record_id, vals):
     create_bindings(session, model_name, record_id)
 
 
-@on_record_create(model_names=BINDINGS.values())
-@on_record_write(model_names=BINDINGS.values())
+@on_record_create(model_names=TRIGGERS.values())
+@on_record_write(model_names=TRIGGERS.values())
 def delay_export_binding(session, model_name, record_id, vals):
     if session.env.context.get('connector_no_export'):
         return
     export_binding.delay(
         session, model_name, record_id,
-        priority=BINDINGS.values().index(model_name))
+        priority=TRIGGERS.values().index(model_name))
 
 
 @odoo
@@ -80,3 +95,4 @@ class OdooSyncDelayedBatchImporter(DelayedBatchOdooImporter):
 @odoo
 class OdooSyncExporter(OdooExporter):
     _model_name = BINDINGS.values()
+    _raw_mode = True

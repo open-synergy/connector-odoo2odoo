@@ -1,1 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_base_sync_policy_all,base.sync.policy - All user ,model_base_sync_policy,,1,0,0,0
+access_base_sync_policy_admin,base.sync.policy - Administrator Setting ,model_base_sync_policy,base.group_system,1,1,1,1

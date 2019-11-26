@@ -27,6 +27,11 @@ class OdooExporter(Exporter):
                 u"%s - Skipping export for binding record '%s'",
                 binding.backend_id.name, binding)
             return
+        if not self.check_sync_policy(binding):
+            _logger.info(
+                u"[Policy]%s - Skipping export for binding record '%s'",
+                binding.backend_id.name, binding)
+            return
         return self.export_record(binding)
 
     """Write By OpenSynergy Indonesia November 2019"""
@@ -51,9 +56,8 @@ class OdooExporter(Exporter):
         return {
             "record": object
         }
-    """============================================"""
 
-    def check_export(self, binding):
+    def check_sync_policy(self, binding):
         """Check if the binding record should be exported."""
 
         """Write By OpenSynergy Indonesia November 2019"""
@@ -88,6 +92,11 @@ class OdooExporter(Exporter):
                 result = True
         return result
         """============================================"""
+
+    def check_export(self, binding):
+        """Check if the binding record should be exported."""
+
+        return True
 
     def export_record(self, binding):
         """Export the binding record and its dependencies."""

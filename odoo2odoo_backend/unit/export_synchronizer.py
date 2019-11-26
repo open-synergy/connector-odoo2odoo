@@ -8,6 +8,8 @@ from openerp.addons.connector.queue.job import job
 
 from ..connector import get_environment, create_binding
 
+from openerp.tools.safe_eval import safe_eval as eval
+
 _logger = logging.getLogger(__name__)
 
 
@@ -27,9 +29,65 @@ class OdooExporter(Exporter):
             return
         return self.export_record(binding)
 
+    """Write By OpenSynergy Indonesia November 2019"""
+    """============================================"""
+    def _prepare_criteria_policy(self, model_name):
+        return [
+            ('backend_id', '=', self.backend_record.id),
+            ("model_id", "=", str(model_name)),
+            ("active", "=", True),
+        ]
+
+    def _get_record_model(self, binding):
+        model_name =\
+            getattr(binding.odoo_id, "_model")
+        return model_name
+
+    def _get_localdict(self, model_name, odoo_id):
+        object = self.env[str(model_name)].browse(
+            [odoo_id]
+        )[0]
+
+        return {
+            "record": object
+        }
+    """============================================"""
+
     def check_export(self, binding):
         """Check if the binding record should be exported."""
-        return True
+
+        """Write By OpenSynergy Indonesia November 2019"""
+        """============================================"""
+        result = True
+        obj_sync_policy =\
+            self.env["base.sync.policy"]
+        model_name =\
+            self._get_record_model(binding)
+        localdict =\
+            self._get_localdict(
+                model_name,
+                binding.odoo_id.id)
+        criteria =\
+            self._prepare_criteria_policy(model_name)
+        sync_policy =\
+            obj_sync_policy.search(criteria)
+
+        if sync_policy:
+            try:
+                _logger.info(
+                    u"%s - Executing python condition",
+                    sync_policy.name)
+                eval(sync_policy.python_condition,
+                     localdict, mode="exec", nocopy=True)
+                result = localdict["result"]
+
+            except Exception, e:
+                _logger.info(
+                    u"Error %s",
+                    str(e))
+                result = True
+        return result
+        """============================================"""
 
     def export_record(self, binding):
         """Export the binding record and its dependencies."""

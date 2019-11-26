@@ -46,6 +46,15 @@ class OdooBackend(models.Model):
     username = fields.Char(u"Username", required=True)
     password = fields.Char(u"Password", required=True)
 
+    """Write By OpenSynergy Indonesia November 2019"""
+    """============================================"""
+    sync_policy_ids = fields.One2many(
+        string="Syncronization Policy",
+        comodel_name="base.sync.policy",
+        inverse_name="backend_id",
+    )
+    """============================================"""
+
     @api.multi
     @api.depends('location')
     def _compute_url_data(self):

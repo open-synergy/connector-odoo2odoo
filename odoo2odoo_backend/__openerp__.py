@@ -4,7 +4,7 @@
 {
     "name": "Odoo2Odoo - Backend",
     "summary": "Framework to sync data between Odoo servers.",
-    "version": "8.0.1.0.0",
+    "version": "8.0.2.0.0",
     "category": "Tools",
     "website": "http://osiell.com/",
     "author": "ABF OSIELL, Odoo Community Association (OCA)",
@@ -21,7 +21,8 @@
     "data": [
         "security/ir.model.access.csv",
         'data/odoo_backend.xml',
-        'views/menu.xml',
-        'views/backend.xml',
+        "views/menu.xml",
+        "views/base_sync_policy_view.xml",
+        "views/backend.xml",
     ],
 }

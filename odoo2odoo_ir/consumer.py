@@ -2,7 +2,6 @@
 # Copyright 2018 ABF OSIELL <http://osiell.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from collections import OrderedDict
-import sys
 
 from openerp.addons.connector.event import on_record_create, on_record_write
 

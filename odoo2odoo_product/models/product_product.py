@@ -3,10 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from openerp import models, fields
 
-from openerp.addons.odoo2odoo_backend.backend import odoo
-
-from ..consumer import OdooSyncExportMapper
-
 
 class ProductProduct(models.Model):
     _name = 'product.product'

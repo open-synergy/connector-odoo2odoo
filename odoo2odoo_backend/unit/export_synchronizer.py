@@ -8,6 +8,8 @@ from openerp.addons.connector.queue.job import job
 
 from ..connector import get_environment, create_binding
 
+from openerp.tools.safe_eval import safe_eval as eval
+
 _logger = logging.getLogger(__name__)
 
 
@@ -20,15 +22,114 @@ class OdooExporter(Exporter):
         Returns `True` if the record has been exported.
         """
         binding = self.model.browse(binding_id)
+        if not self.check_no_export_record(binding):
+            _logger.info(
+                u"[No Export]%s - Skipping export for binding record '%s'",
+                binding.backend_id.name, binding)
+            return
         if not self.check_export(binding):
             _logger.info(
                 u"%s - Skipping export for binding record '%s'",
                 binding.backend_id.name, binding)
             return
+        if not self.check_sync_policy(binding):
+            _logger.info(
+                u"[Policy]%s - Skipping export for binding record '%s'",
+                binding.backend_id.name, binding)
+            return
         return self.export_record(binding)
+
+    """Write By OpenSynergy Indonesia November 2019"""
+    """============================================"""
+    def _prepare_criteria_policy(self, model_name):
+        return [
+            ('backend_id', '=', self.backend_record.id),
+            ("model_id", "=", str(model_name)),
+            ("active", "=", True),
+        ]
+
+    def _get_record_binding_model(self, binding):
+        model_name =\
+            getattr(binding, "_model")
+        return model_name
+
+    def _get_record_model(self, binding):
+        model_name =\
+            getattr(binding.odoo_id, "_model")
+        return model_name
+
+    def _get_no_export_field(self, binding):
+        field_name =\
+            getattr(binding.odoo_id, "_no_export_field")
+        return field_name
+
+    def _get_localdict(self, model_name, odoo_id):
+        object = self.env[str(model_name)].browse(
+            [odoo_id]
+        )[0]
+
+        return {
+            "record": object
+        }
+
+    def check_sync_policy(self, binding):
+        """Check if the binding record should be exported."""
+
+        """Write By OpenSynergy Indonesia November 2019"""
+        """============================================"""
+        result = True
+        obj_sync_policy =\
+            self.env["base.sync.policy"]
+        binding_model_name =\
+            self._get_record_binding_model(binding)
+        model_name =\
+            self._get_record_model(binding)
+        localdict =\
+            self._get_localdict(
+                model_name,
+                binding.odoo_id.id)
+        criteria =\
+            self._prepare_criteria_policy(binding_model_name)
+        sync_policy =\
+            obj_sync_policy.search(criteria)
+
+        if sync_policy:
+            try:
+                _logger.info(
+                    u"%s - Executing python condition",
+                    sync_policy.name)
+                eval(sync_policy.python_condition,
+                     localdict, mode="exec", nocopy=True)
+                result = localdict["result"]
+
+            except Exception, e:
+                _logger.info(
+                    u"Error %s",
+                    str(e))
+                result = False
+        return result
+
+    def check_no_export_record(self, binding):
+        result = True
+        try:
+            f_no_export =\
+                self._get_no_export_field(binding)
+        except:
+            f_no_export = False
+
+        if f_no_export:
+            no_export =\
+                binding.odoo_id.mapped(str(f_no_export))
+
+        if no_export[0]:
+            return False
+
+        return result
+        """============================================"""
 
     def check_export(self, binding):
         """Check if the binding record should be exported."""
+
         return True
 
     def export_record(self, binding):

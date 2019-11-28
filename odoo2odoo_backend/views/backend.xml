@@ -10,8 +10,11 @@
                     <header>
                         <button name="check_auth" type="object"
                             string="Check connection" colspan="2"
+                            class="oe_highlight"/>
+                        <button name="deactivated" type="object"
+                            string="Deactivated" colspan="2"
                             class="oe_highlight"
-                            attrs="{'invisible': [('location', '=', False)]}"/>
+                            attrs="{'invisible': [('active', '=', False)]}"/>
                     </header>
                     <sheet>
                         <label for="name" class="oe_edit_only"/>
@@ -27,8 +30,27 @@
                                 <field name="database"/>
                                 <field name="username" colspan="2"/>
                                 <field name="password" colspan="2" password="True"/>
+                                <field name="connection_ok" invisible="1"/>
                             </group>
                         </group>
+                        <notebook>
+                            <page name="page_connection_info" string="Connection Information">
+                                <group colspan="4" col="4">
+                                    <field name="connection_info" nolabel="1"/>
+                                </group>
+                            </page>
+                            <page name="page_sync_policy" string="Syncronization Policy" attrs="{'invisible': [('connection_ok', '=', False)]}">
+                              <field name="allowed_model_ids" widget="many2many_tags" invisible="1"/>
+                                <group colspan="4" col="4">
+                                    <field name="sync_policy_ids" nolabel="1" context="{'backend_id': active_id}">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="model_id"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

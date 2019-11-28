@@ -4,7 +4,7 @@
 {
     "name": "Odoo2Odoo - Products",
     "summary": "Sync products between Odoo servers.",
-    "version": "8.0.1.0.0",
+    "version": "8.0.2.0.0",
     "category": "Tools",
     "website": "http://osiell.com/",
     "author": "ABF OSIELL, Odoo Community Association (OCA)",
@@ -18,10 +18,15 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/odoo_product_uom_categ.xml",
         "views/product_uom_categ.xml",
+        "views/odoo_product_uom.xml",
         "views/product_uom.xml",
+        "views/odoo_product_category.xml",
         "views/product_category.xml",
+        "views/odoo_product_template.xml",
         "views/product_template.xml",
+        "views/odoo_product_product.xml",
         "views/product_product.xml",
     ],
 }

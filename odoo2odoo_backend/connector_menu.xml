@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <menuitem id="menu_binding"
+            name="Bindings"
+            parent="connector.menu_connector_root" />
+    </data>
+</openerp>

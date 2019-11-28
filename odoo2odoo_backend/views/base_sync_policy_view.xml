@@ -11,8 +11,12 @@
                 <form string="sync Policy">
                     <sheet>
                         <group name="group_1" col="2" colspan="2">
+                            <field name="backend_id" invisible="1"/>
                             <field name="name"/>
-                            <field name="model_id"/>
+                            <field
+                                name="model_id"
+                                domain="[('id', 'in', parent.allowed_model_ids[0][2])]"
+                                options="{'no_create_edit': True}"/>
                             <field name="active"/>
                         </group>
                         <notebook>

@@ -12,7 +12,9 @@
     "application": False,
     "installable": True,
     "external_dependencies": {
-        "python": ['odoorpc'],
+        "python": [
+            "odoorpc"
+        ],
     },
     "depends": [
         "connector",
@@ -20,6 +22,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "connector_menu.xml",
         'data/odoo_backend.xml',
         "views/menu.xml",
         "views/base_sync_policy_view.xml",

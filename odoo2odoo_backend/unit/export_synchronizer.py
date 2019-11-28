@@ -22,6 +22,11 @@ class OdooExporter(Exporter):
         Returns `True` if the record has been exported.
         """
         binding = self.model.browse(binding_id)
+        if not self.check_no_export_record(binding):
+            _logger.info(
+                u"[No Export]%s - Skipping export for binding record '%s'",
+                binding.backend_id.name, binding)
+            return
         if not self.check_export(binding):
             _logger.info(
                 u"%s - Skipping export for binding record '%s'",
@@ -43,10 +48,20 @@ class OdooExporter(Exporter):
             ("active", "=", True),
         ]
 
+    def _get_record_binding_model(self, binding):
+        model_name =\
+            getattr(binding, "_model")
+        return model_name
+
     def _get_record_model(self, binding):
         model_name =\
             getattr(binding.odoo_id, "_model")
         return model_name
+
+    def _get_no_export_field(self, binding):
+        field_name =\
+            getattr(binding.odoo_id, "_no_export_field")
+        return field_name
 
     def _get_localdict(self, model_name, odoo_id):
         object = self.env[str(model_name)].browse(
@@ -65,6 +80,8 @@ class OdooExporter(Exporter):
         result = True
         obj_sync_policy =\
             self.env["base.sync.policy"]
+        binding_model_name =\
+            self._get_record_binding_model(binding)
         model_name =\
             self._get_record_model(binding)
         localdict =\
@@ -72,7 +89,7 @@ class OdooExporter(Exporter):
                 model_name,
                 binding.odoo_id.id)
         criteria =\
-            self._prepare_criteria_policy(model_name)
+            self._prepare_criteria_policy(binding_model_name)
         sync_policy =\
             obj_sync_policy.search(criteria)
 
@@ -89,7 +106,24 @@ class OdooExporter(Exporter):
                 _logger.info(
                     u"Error %s",
                     str(e))
-                result = True
+                result = False
+        return result
+
+    def check_no_export_record(self, binding):
+        result = True
+        try:
+            f_no_export =\
+                self._get_no_export_field(binding)
+        except:
+            f_no_export = False
+
+        if f_no_export:
+            no_export =\
+                binding.odoo_id.mapped(str(f_no_export))
+
+        if no_export[0]:
+            return False
+
         return result
         """============================================"""
 

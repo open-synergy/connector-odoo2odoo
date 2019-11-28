@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2019 OpenSynergy Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+
+<openerp>
+    <data>
+        <record id="base_sync_policy_view_form" model="ir.ui.view">
+            <field name="name">base.sync.policy.form</field>
+            <field name="model">base.sync.policy</field>
+            <field name="arch" type="xml">
+                <form string="sync Policy">
+                    <sheet>
+                        <group name="group_1" col="2" colspan="2">
+                            <field name="backend_id" invisible="1"/>
+                            <field name="name"/>
+                            <field
+                                name="model_id"
+                                domain="[('id', 'in', parent.allowed_model_ids[0][2])]"
+                                options="{'no_create_edit': True}"/>
+                            <field name="active"/>
+                        </group>
+                        <notebook>
+                            <page name="condition" string="Condition">
+                                <field name="python_condition"/>
+                            </page>
+                            <page name="note" string="Notes">
+                                <field name="description"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

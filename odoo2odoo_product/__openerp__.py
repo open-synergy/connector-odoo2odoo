@@ -18,10 +18,15 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/odoo_product_uom_categ.xml",
         "views/product_uom_categ.xml",
+        "views/odoo_product_uom.xml",
         "views/product_uom.xml",
+        "views/odoo_product_category.xml",
         "views/product_category.xml",
+        "views/odoo_product_template.xml",
         "views/product_template.xml",
+        "views/odoo_product_product.xml",
         "views/product_product.xml",
     ],
 }

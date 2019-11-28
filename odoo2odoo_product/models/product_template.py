@@ -5,23 +5,31 @@ from openerp import models, fields
 
 
 class ProductTemplate(models.Model):
-    _name = 'product.template'
-    _inherit = ['product.template']
+    _name = "product.template"
+    _inherit = ["product.template"]
+    _no_export_field = "no_export_tmpl"
 
     odoo_bind_ids = fields.One2many(
-        'odoo.product.template',
-        inverse_name='odoo_id',
-        string=u"Odoo Bindings",
-        readonly=True)
+        comodel_name="odoo.product.template",
+        inverse_name="odoo_id",
+        string="Odoo Bindings",
+        readonly=True
+    )
+    no_export_tmpl = fields.Boolean(
+        string="Exclude Template From Export",
+        default=True,
+    )
 
 
 class OdooProductTemplate(models.Model):
-    _name = 'odoo.product.template'
-    _inherit = 'odoo.binding'
-    _inherits = {'product.template': 'odoo_id'}
+    _name = "odoo.product.template"
+    _inherit = "odoo.binding"
+    _inherits = {"product.template": "odoo_id"}
+    _description = "Product Template Binding"
 
     odoo_id = fields.Many2one(
-        'product.template',
-        string=u"Product",
+        comodel_name="product.template",
+        string="Product",
         required=True,
-        ondelete='cascade')
+        ondelete="cascade"
+    )

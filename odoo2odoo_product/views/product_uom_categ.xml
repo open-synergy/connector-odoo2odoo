@@ -10,9 +10,11 @@
     <field name="inherit_id" ref="product.product_uom_categ_form_view"/>
     <field name="arch" type="xml">
         <form position="inside">
-            <group name="odoo2odoo" string="Odoo2Odoo" groups="connector.group_connector_manager">
-                <field name="odoo_bind_ids" nolabel="1"/>
-            </group>
+          <field name="no_export"/>
+          <label for="no_export"/>
+          <group name="odoo2odoo" groups="connector.group_connector_manager">
+              <field name="odoo_bind_ids" nolabel="1"/>
+          </group>
         </form>
     </field>
 </record>

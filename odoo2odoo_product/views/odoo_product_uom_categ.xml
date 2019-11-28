@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="odoo_product_uom_categ_view_search" model="ir.ui.view">
+            <field name="name">odoo.product.uom.categ.search</field>
+            <field name="model">odoo.product.uom.categ</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group expand="0" string="Group By">
+                        <filter string="Backend" name="backend" context="{'group_by':'backend_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="odoo_product_uom_categ_view_form" model="ir.ui.view">
+            <field name="name">odoo.product.uom.categ.form</field>
+            <field name="model">odoo.product.uom.categ</field>
+            <field name="arch" type="xml">
+                <form create="false" delete="false">
+                    <sheet>
+                        <group name="group_1" colspan="4" col="2">
+                            <field name="backend_id" readonly="1"/>
+                            <field name="odoo_id" readonly="1"/>
+                            <field name="external_odoo_id"/>
+                            <field name="sync_date" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="odoo_product_uom_categ_view_tree" model="ir.ui.view">
+            <field name="name">odoo.product.uom.categ.tree</field>
+            <field name="model">odoo.product.uom.categ</field>
+            <field name="arch" type="xml">
+                <tree create="false" delete="false">
+                    <field name="backend_id"/>
+                    <field name="odoo_id"/>
+                    <field name="external_odoo_id"/>
+                    <field name="sync_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="odoo_product_uom_categ_action" model="ir.actions.act_window">
+            <field name="name">Binding: Product uom.categ</field>
+            <field name="res_model">odoo.product.uom.categ</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="odoo_product_uom_categ_view_search"/>
+            <field name="context">{'search_default_backend': 1}</field>
+        </record>
+
+        <menuitem
+            id="odoo_product_uom_categ_menu"
+            name="UoM Categories"
+            action="odoo_product_uom_categ_action"
+            parent="odoo2odoo_backend.menu_binding"
+            sequence="4"/>
+    </data>
+</openerp>

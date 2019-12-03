@@ -17,5 +17,6 @@
     "data": [
         "data/ir_cron_data.xml",
         "views/sale_order_views.xml",
+        "views/backend.xml",
     ],
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<record id="view_odoo_backend_form" model="ir.ui.view">
+    <field name="name">odoo.backend.import.po2so.form</field>
+    <field name="model">odoo.backend</field>
+    <field name="inherit_id" ref="odoo2odoo_backend.view_odoo_backend_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//page[last()]" position="after">
+            <page name="page_import_po2so" string="Import PO to SO" groups="connector.group_connector_manager">
+                <group name="group_import_po2so">
+                    <field name="external_partner_id"/>
+                    <field name="import_po_date_start"/>
+                    <field name="import_po_date_end"/>
+                    <field name="import_additional_domain"/>
+                    <field name="import_po2so_info"/>
+                </group>
+            </page>
+        </xpath>
+    </field>
+</record>
+</data>
+</openerp>

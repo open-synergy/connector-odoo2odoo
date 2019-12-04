@@ -5,67 +5,12 @@
 from openerp import models
 
 from openerp.addons.connector.unit.mapper import (
-    mapping, ImportMapper, ExportMapper)
+    mapping, ExportMapper)
 
 from .export_synchronizer import OdooExporter
 
 COLUMNS_BLACKLIST = models.MAGIC_COLUMNS[:]
 COLUMNS_BLACKLIST += ['__last_update']
-
-
-class OdooImportMapper(ImportMapper):
-    _model_name = None
-
-    @mapping
-    def odoo2odoo(self, data):
-        """Transform an external Odoo's record to its local Odoo's counterpart.
-        This method has to return a dictionary of values, e.g.
-        for a `product.product` record::
-
-            return {
-                'name': u"Test",
-                'default_code': u"Test",
-            }
-
-        By default the method will map all basic field values present in
-        `data` (as long as they exist in the targeted data model) and Many2one
-        fields which are involved in the synchronization mechanism.
-        """
-        model2binding = self.backend_record.get_model_bindings()
-        fields_data = self.model.fields_get([])
-        # Clean up data
-        local_fields = set(
-            k for k, v in fields_data.iteritems()
-            if not v['type'].endswith('2many'))
-        remote_fields = set(data)
-        import_fields = list(
-            local_fields.intersection(remote_fields) - set(COLUMNS_BLACKLIST))
-        for field in list(data):
-            if field not in import_fields:
-                data.pop(field)
-        # Map linked record
-        for field in data.keys():
-            if not data[field]:
-                continue
-            # Map the value of Many2one/Reference fields
-            if fields_data[field]['type'] in ('many2one', 'reference'):
-                relation = ''
-                # Many2one
-                if fields_data[field]['type'] == 'many2one':
-                    relation = fields_data[field]['relation']
-                # Reference
-                elif fields_data[field]['type'] == 'reference':
-                    relation = data[field].split(',')[0]
-                # Skip if the targeted relation is not involved
-                if not relation or relation not in model2binding:
-                    data.pop(field)
-                    continue
-                # Get the relevant binding
-                binding_model = model2binding[relation]
-                binder = self.binder_for(binding_model)
-                binding = binder.to_openerp(data[field])
-                data[field] = binding.odoo_id.id
-        return data
 
 
 class OdooExportMapper(ExportMapper):

@@ -243,9 +243,6 @@ def import_batch(session, model_name, backend_id, domain=None):
     """Prepare a batch import of records from an external Odoo server."""
     env = get_environment(session, model_name, backend_id)
     importer = env.get_connector_unit(BatchOdooImporter)
-    _logger.info(
-        u"%s - Importing external record '(%s)'...",
-        env.backend_record.name, model_name)
     importer.run(domain=domain)
 
 

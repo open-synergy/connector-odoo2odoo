@@ -4,5 +4,6 @@
 
 from . import (
     odoo_backend,
-    sale,
+    sale_order,
+    sale_order_line,
 )

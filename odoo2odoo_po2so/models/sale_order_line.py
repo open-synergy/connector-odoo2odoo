@@ -5,16 +5,14 @@ import logging
 
 from openerp import models, fields
 
-logger = logging.getLogger(__name__)
 
-
-class SaleOrder(models.Model):
-    _name = "sale.order"
-    _inherit = ["sale.order"]
+class SaleOrderLine(models.Model):
+    _name = "sale.order.line"
+    _inherit = ["sale.order.line"]
     _no_export_field = "no_export"
 
     odoo_bind_ids = fields.One2many(
-        comodel_name="odoo.sale.order",
+        comodel_name="odoo.sale.order.line",
         inverse_name="odoo_id",
         string="Odoo Bindings",
         readonly=True
@@ -25,15 +23,15 @@ class SaleOrder(models.Model):
     )
 
 
-class OdooSaleOrder(models.Model):
-    _name = "odoo.sale.order"
+class OdooSaleOrderLine(models.Model):
+    _name = "odoo.sale.order.line"
     _inherit = "odoo.binding"
-    _inherits = {"sale.order": "odoo_id"}
-    _description = "Sale Orders Binding"
+    _inherits = {"sale.order.line": "odoo_id"}
+    _description = "Sale Order Lines Binding"
 
     odoo_id = fields.Many2one(
-        comodel_name="sale.order",
-        string="Order ID",
+        comodel_name="sale.order.line",
+        string="Order Line ID",
         required=True,
         ondelete="cascade"
     )

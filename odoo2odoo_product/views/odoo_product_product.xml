@@ -20,8 +20,8 @@
                 <form>
                     <sheet>
                         <group name="group_1" colspan="4" col="2">
-                            <field name="backend_id" readonly="1"/>
-                            <field name="odoo_id" readonly="1"/>
+                            <field name="backend_id" widget="selection"/>
+                            <field name="odoo_id" widget="selection"/>
                             <field name="external_odoo_id"/>
                             <field name="sync_date" readonly="1"/>
                         </group>
@@ -34,7 +34,7 @@
             <field name="name">odoo.product.product.tree</field>
             <field name="model">odoo.product.product</field>
             <field name="arch" type="xml">
-                <form>
+                <tree>
                     <field name="backend_id"/>
                     <field name="odoo_id"/>
                     <field name="external_odoo_id"/>

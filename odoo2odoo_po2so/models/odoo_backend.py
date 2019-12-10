@@ -12,8 +12,35 @@ _logger = logging.getLogger(__name__)
 class OdooBackend(models.Model):
     _inherit = "odoo.backend"
 
+    po_partner_id = fields.Many2one(
+        string="External Supplier",
+        comodel_name="res.partner",
+    )
+
+    @api.multi
+    @api.depends(
+        "po_partner_id",
+        "po_partner_id.odoo_bind_ids",
+        "po_partner_id.odoo_bind_ids.external_odoo_id",
+    )
+    def _compute_external_partner_id(self):
+        obj_odoo_res_partner =\
+            self.env["odoo.res.partner"]
+
+        for document in self:
+            if document.po_partner_id:
+                odoo_partner_ids =\
+                    obj_odoo_res_partner.search([
+                        ("odoo_id", "=", document.po_partner_id.id)
+                    ])
+                document.external_partner_id =\
+                    odoo_partner_ids.external_odoo_id
+
     external_partner_id = fields.Integer(
-        string="External Partner ID"
+        string="External Partner ID",
+        compute="_compute_external_partner_id",
+        store=True,
+        default=0,
     )
     import_po_date_start = fields.Datetime(
         string="Purchase Date Start",

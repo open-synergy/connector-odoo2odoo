@@ -4,7 +4,7 @@
 # pylint: disable=locally-disabled, manifest-required-author
 {
     "name": "Odoo2Odoo - Import PO to SO",
-    "version": "8.0.1.0.0",
+    "version": "8.0.2.1.0",
     "category": "Connector Managements",
     "website": "https://opensynergy-indonesia.com",
     "author": "OpenSynergy Indonesia",
@@ -12,6 +12,7 @@
     "installable": True,
     "depends": [
         "odoo2odoo_product",
+        "odoo2odoo_partner",
         "sale",
     ],
     "data": [

@@ -7,7 +7,7 @@ from openerp.addons.odoo2odoo_backend.unit.binder import OdooModelBinder
 from openerp.addons.odoo2odoo_backend.unit.backend_adapter \
     import GenericCRUDAdapter
 from openerp.addons.connector.unit.mapper import (
-    mapping, ImportMapper)
+    mapping, ImportMapper, follow_m2o_relations)
 from openerp.addons.odoo2odoo_backend.unit.import_synchronizer import (
     OdooImporter, DirectBatchOdooImporter, DelayedBatchOdooImporter)
 _logger = logging.getLogger(__name__)
@@ -28,6 +28,7 @@ class SaleOrderLineSyncAdapter(GenericCRUDAdapter):
 class SaleOrderSyncBinder(OdooModelBinder):
     _model_name = ["odoo.sale.order"]
 
+
 @odoo
 class SaleOrderLineSyncBinder(OdooModelBinder):
     _model_name = ["odoo.sale.order.line"]
@@ -41,15 +42,23 @@ class SaleOrderSyncDirectBatchImporter(DirectBatchOdooImporter):
 @odoo
 class SaleOrderSyncImporter(OdooImporter):
     _model_name = ["odoo.sale.order"]
-    _raw_mode = True
     _cross_model = True
 
 @odoo
 class SaleOrderSyncImportMapper(ImportMapper):
     _model_name = "odoo.sale.order"
 
+    def _get_origin(field):
+        def modifier(self, record, to_attr):
+            server_name =\
+                self.backend_record.name
+            server_name = "[" + server_name + "]"
+            name = server_name + " " + record[field]
+            return name
+        return modifier
+
     direct = [
-        ("name", "name"),
+        (_get_origin("name"), "origin"),
     ]
 
     children = [
@@ -80,20 +89,27 @@ class SaleOrderSyncImportMapper(ImportMapper):
 
     @mapping
     def partner_id(self, record):
-        _logger.info("Record SO: %s", record)
-        return {'partner_id': 1}
+        adapter = self.unit_for(GenericCRUDAdapter, "odoo.res.company")
+        company_ids = adapter.read(record["company_id"])
+        _logger.info('COMPANY IDS:%s', company_ids["partner_id"])
+        external_partner_id = company_ids["partner_id"][0]
+        binder = self.binder_for("odoo.res.partner")
+        partner_id = binder.to_openerp(external_partner_id)
+        _logger.info('EXTERNAL ID:%s\n PARTNER ID:%s', external_partner_id, partner_id)
+        if partner_id:
+            return {"partner_id": partner_id.odoo_id.id}
 
     @mapping
     def pricelist_id(self, record):
-        return {'pricelist_id': 1}
+        return {"pricelist_id": 1}
 
     @mapping
     def partner_invoice_id(self, record):
-        return {'partner_invoice_id': 1}
+        return {"partner_invoice_id": 1}
 
     @mapping
     def partner_shipping_id(self, record):
-        return {'partner_shipping_id': 1}
+        return {"partner_shipping_id": 1}
 
 @odoo
 class SaleOrderLineSyncImportMapper(ImportMapper):
@@ -108,15 +124,11 @@ class SaleOrderLineSyncImportMapper(ImportMapper):
     def product_uom_qty(self, record):
         qty =\
             float(record.get("product_qty") or 0.0)
-        return {'product_uom_qty': qty}
+        return {"product_uom_qty": qty}
 
     @mapping
     def product_id(self, record):
-        binder = self.binder_for('odoo.product.product')
-        product_id = binder.to_openerp(record['product_id'][0], unwrap=True)
-        # _logger.info("Record: %s", product_id)
-        # assert product_id is not None, (
-        #     "product_id %s should have been imported in "
-        #     "SaleOrderImporter._import_dependencies" % record['product_id'])
+        binder = self.binder_for("odoo.product.product")
+        product_id = binder.to_openerp(record["product_id"][0], unwrap=True)
         if product_id:
-            return {'product_id': product_id.id}
+            return {"product_id": product_id.id}

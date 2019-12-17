@@ -23,17 +23,17 @@ class OdooExporter(Exporter):
         """
         binding = self.model.browse(binding_id)
         if not self.check_no_export_record(binding):
-            _logger.info(
+            _logger.debug(
                 u"[No Export]%s - Skipping export for binding record '%s'",
                 binding.backend_id.name, binding)
             return
         if not self.check_export(binding):
-            _logger.info(
+            _logger.debug(
                 u"%s - Skipping export for binding record '%s'",
                 binding.backend_id.name, binding)
             return
         if not self.check_sync_policy(binding):
-            _logger.info(
+            _logger.debug(
                 u"[Policy]%s - Skipping export for binding record '%s'",
                 binding.backend_id.name, binding)
             return
@@ -95,7 +95,7 @@ class OdooExporter(Exporter):
 
         if sync_policy:
             try:
-                _logger.info(
+                _logger.debug(
                     u"%s - Executing python condition",
                     sync_policy.name)
                 eval(sync_policy.python_condition,
@@ -103,7 +103,7 @@ class OdooExporter(Exporter):
                 result = localdict["result"]
 
             except Exception, e:
-                _logger.info(
+                _logger.debug(
                     u"Error %s",
                     str(e))
                 result = False
@@ -221,7 +221,7 @@ def export_binding(session, model_name, binding_id):
     backend_id = binding.backend_id.id
     env = get_environment(session, model_name, backend_id)
     exporter = env.get_connector_unit(OdooExporter)
-    _logger.info(
+    _logger.debug(
         u"%s - Exporting binding record '%s'...",
         binding.backend_id.name, binding)
     exporter.run(binding_id)

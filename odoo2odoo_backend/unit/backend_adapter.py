@@ -46,7 +46,7 @@ class GenericAPIAdapter(BackendAdapter):
                 self.backend_record.username,
                 self.backend_record.password)
             client.env.context.clear()
-            _logger.info(
+            _logger.debug(
                 "%s - Session open for user %s",
                 self.backend_record.name,
                 self.backend_record.username)
@@ -72,16 +72,14 @@ class GenericAPIAdapter(BackendAdapter):
                 'args': args,
                 'kwargs': kwargs,
             }
-            _logger.info("%s - %s", self.backend_record.name, log)
+            _logger.debug("%s - %s", self.backend_record.name, log)
+        odoo_model = self.odoo_session.env[model_name]
         try:
-            odoo_model = self.odoo_session.env[model_name]
             data = getattr(odoo_model, method)(*args, **kwargs)
-        except odoorpc.error.RPCError as exc:
-            if exc.info['data']['exception_type'] == 'missing_error':
-                _logger.error(
-                    "%s - ID missing in backend - %s - %s",
-                    self.backend_record.name, log, exc.message)
-                raise IDMissingInBackend
+        except Exception, e:
+            _logger.debug(
+                u"Error when executing: %s",
+                str(e))
             raise
         else:
             return data

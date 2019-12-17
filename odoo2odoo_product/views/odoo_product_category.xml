@@ -20,8 +20,8 @@
                 <form>
                     <sheet>
                         <group name="group_1" colspan="4" col="2">
-                            <field name="backend_id" widget="selection"/>
-                            <field name="odoo_id" widget="selection"/>
+                            <field name="backend_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
+                            <field name="odoo_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
                             <field name="external_odoo_id"/>
                             <field name="sync_date" readonly="1"/>
                         </group>

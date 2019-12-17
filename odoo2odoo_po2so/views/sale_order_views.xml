@@ -19,18 +19,5 @@
     </field>
 </record>
 
-<record id="odoo_sale_order_view_tree" model="ir.ui.view">
-    <field name="name">odoo.sale.order.tree</field>
-    <field name="model">odoo.sale.order</field>
-    <field name="arch" type="xml">
-        <tree string="Odoo2Odoo Bindings">
-            <field name="backend_id"/>
-            <field name="odoo_id"/>
-            <field name="external_odoo_id"/>
-            <field name="sync_date"/>
-        </tree>
-    </field>
-</record>
-
 </data>
 </openerp>

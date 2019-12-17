@@ -4,6 +4,9 @@
 import logging
 
 from openerp import models, fields
+from openerp.addons.connector.queue.job import job
+from openerp.addons.odoo2odoo_backend.connector import get_environment
+from ..consumer import SaleOrderSyncDelayedBatchImporter
 
 
 class SaleOrder(models.Model):
@@ -35,3 +38,16 @@ class OdooSaleOrder(models.Model):
         required=True,
         ondelete="cascade"
     )
+    odoo_order_line_ids = fields.One2many(
+        comodel_name='odoo.sale.order.line',
+        inverse_name='odoo_order_id',
+        string='Sale Order Lines'
+    )
+
+@job(default_channel='root.o2o')
+def import_so_batch(session, model_name, backend_id, domain=None):
+    if domain is None:
+        domain = {}
+    env = get_environment(session, model_name, backend_id)
+    importer = env.get_connector_unit(SaleOrderSyncDelayedBatchImporter)
+    importer.run(domain=domain)

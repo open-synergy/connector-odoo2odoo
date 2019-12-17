@@ -19,5 +19,7 @@
         "data/ir_cron_data.xml",
         "views/sale_order_views.xml",
         "views/backend.xml",
+        "views/odoo_sale_order.xml",
+        "views/odoo_sale_order_line.xml",
     ],
 }

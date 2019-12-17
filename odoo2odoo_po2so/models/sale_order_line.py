@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import logging
 
-from openerp import models, fields
+from openerp import models, fields, api
 
 
 class SaleOrderLine(models.Model):
@@ -35,3 +35,24 @@ class OdooSaleOrderLine(models.Model):
         required=True,
         ondelete="cascade"
     )
+    odoo_order_id = fields.Many2one(
+        comodel_name="odoo.sale.order",
+        string="Odoo SO ID",
+        required=False,
+        ondelete="cascade"
+    )
+    backend_id = fields.Many2one(
+        related='odoo_order_id.backend_id',
+        string='Odoo Backend',
+        readonly=True,
+        store=True,
+        required=False,
+    )
+
+    @api.model
+    def create(self, vals):
+        odoo_order_id = vals["odoo_order_id"]
+        binding = self.env["odoo.sale.order"].browse(odoo_order_id)
+        vals["order_id"] = binding.odoo_id.id
+        binding = super(OdooSaleOrderLine, self).create(vals)
+        return binding

@@ -6,6 +6,7 @@ import logging
 from openerp import models, fields, api
 from openerp.addons.connector.session import ConnectorSession
 from openerp.addons.odoo2odoo_backend.unit.import_synchronizer import import_batch
+from .sale_order import import_so_batch
 _logger = logging.getLogger(__name__)
 
 
@@ -75,7 +76,7 @@ class OdooBackend(models.Model):
             })
             result = False
 
-        return result, str(domain)
+        return result, domain
 
     @api.model
     def import_po_to_so(self):
@@ -88,8 +89,11 @@ class OdooBackend(models.Model):
         for backend in backend_ids:
             result, domain = backend._get_domain_import()
             if result:
-                if domain and isinstance(domain, str):
-                    domain = eval(domain)
-                    import_batch(session, "odoo.sale.order",
-                                 backend.id, domain)
+                import_so_batch.delay(
+                    session,
+                    "odoo.sale.order",
+                    backend.id,
+                    priority=1)
+                import_batch(session, "odoo.sale.order",
+                             backend.id, domain)
         return True

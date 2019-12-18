@@ -14,28 +14,22 @@ from ..connector import get_environment, create_binding
 _logger = logging.getLogger(__name__)
 
 
+
 class OdooImporter(Importer):
     _model_name = []
     _raw_mode = False
+    _cross_model = False
 
-    def run(self, external_ids):
-        """Run the synchronization (create or update the local Odoo record)."""
-        # Fetch the data on the external Odoo server
-        try:
-            records_data = self._get_external_data(external_ids)
-        except IDMissingInBackend:
-            return _("Record(s) does no longer exist "
-                     "in the external Odoo server")
-        for record_data in records_data:
-            external_id = record_data['id']
-            self.import_record(external_id, record_data)
+    def run(self, external_id):
+        self._import_record(external_id)
 
-    def import_record(self, external_id, record_data):
-        """Try to import the external record."""
+    def _import_record(self, external_id):
+        record_data =\
+            self._get_external_data(external_id)
         binding = self._get_binding(external_id, record_data)
         # Check if the import should be processed
         if not self.check_import(external_id, record_data, binding):
-            _logger.info(
+            _logger.debug(
                 u"%s - Skipping import for the external record (%s,%s)",
                 self.backend_record.name, self.model._name, external_id)
             return
@@ -48,13 +42,14 @@ class OdooImporter(Importer):
         )
         self.advisory_lock_or_retry(lock_name)
         self._before_import(external_id, record_data, binding)
-        # Import the missing record dependencies
         self._import_dependencies(external_id, record_data, binding)
-        # Update/create the record
+        map_record = self._map_data(record_data)
         if binding.external_odoo_id:
-            self.update_record(binding, record_data)
+            record = self._update_data(map_record)
+            self.update_record(binding, record)
         else:
-            self.create_record(external_id, record_data)
+            record = self._create_data(map_record)
+            self.create_record(external_id, record)
         self._after_import(binding)
         return True
 
@@ -63,29 +58,41 @@ class OdooImporter(Importer):
         binding = self.binder.to_openerp(external_id, record_data=record_data)
         return binding
 
+    def _get_binding_cross_model(self):
+        return self.binder.to_openerp_cross_model(self.external_id, browse=True)
+
     def check_import(self, external_id, record_data, binding):
         """Check if the external record should be imported."""
         if self._is_uptodate(external_id, record_data, binding):
             return False
         return True
 
+    def _map_data(self, record):
+        return self.mapper.map_record(record)
+
+    def _create_data(self, map_record, **kwargs):
+        return map_record.values(for_create=True, **kwargs)
+
+    def _update_data(self, map_record, **kwargs):
+        return map_record.values(**kwargs)
+
+    def _must_skip(self):
+
+        return
+
     def update_record(self, binding, record_data):
-        mapped_record = self.mapper.map_record(record_data)
-        data = mapped_record.values()
         binding = binding.with_context(connector_no_export=True)
         if self._raw_mode:
             record = getattr(binding, self.binder._openerp_field)
-            record.o2o_write(data)
+            record.o2o_write(record_data)
         else:
-            binding.write(data)
-        _logger.info(
+            binding.write(record_data)
+        _logger.debug(
             u"%s - Binding record '%s' imported (updated)",
             self.backend_record.name, binding)
         return True
 
     def create_record(self, external_id, record_data):
-        mapped_record = self.mapper.map_record(record_data)
-        data = mapped_record.values(for_create=True)
         model = self.model.with_context(connector_no_export=True)
         if self._raw_mode:
             rel_field = self.binder._openerp_field
@@ -97,17 +104,17 @@ class OdooImporter(Importer):
                 self.session, model._name, record.id,
                 self.backend_record.id, force=True)
         else:
-            data['backend_id'] = self.backend_record.id
-            binding = model.create(data)
+            record_data['backend_id'] = self.backend_record.id
+            binding = model.create(record_data)
         self.binder.bind(external_id, binding.id)
-        _logger.info(
+        _logger.debug(
             u"%s - Binding record '%s' imported (created)",
             self.backend_record.name, binding)
         return binding
 
-    def _get_external_data(self, external_ids):
+    def _get_external_data(self, external_id):
         """Return the record data from the external Odoo server."""
-        return self.backend_adapter.read(external_ids, load='_classic_write')
+        return self.backend_adapter.read(external_id)
 
     def _is_uptodate(self, external_id, record_data, binding):
         """Return True if the local record is already up-to-date."""
@@ -121,7 +128,7 @@ class OdooImporter(Importer):
         backend_date = fields.Datetime.from_string(record_data['write_date'])
         uptodate = backend_date < sync_date
         if uptodate:
-            _logger.info(
+            _logger.debug(
                 u"%s - External record (%s,%s) is up-to-date",
                 self.backend_record.name, self.model._name, external_id)
         return uptodate
@@ -167,7 +174,7 @@ class OdooImporter(Importer):
         binder = self.binder_for(binding_model)
         if always or not binder.to_openerp(external_id):
             importer = self.unit_for(importer_class, model=binding_model)
-            importer.run([external_id])
+            importer.run(external_id)
 
     def _import_dependencies(self, external_id, record_data, binding):
         """Import the dependencies for the record."""
@@ -180,16 +187,10 @@ class BatchOdooImporter(Importer):
     the import of each item separately.
     """
 
-    def run(self, domain=None, bulk=False):
-        """ Run the synchronization """
-        if domain is None:
-            domain = []
-        external_ids = self.backend_adapter.search(domain)
-        if bulk:
-            self._import_records(external_ids)
-            return
-        for external_id in external_ids:
-            self._import_records([external_id])
+    def run(self, domain=None):
+        record_ids = self.backend_adapter.search(domain)
+        for record_id in record_ids:
+            self._import_records(record_id)
 
     def _import_records(self, external_ids):
         """Import records directly or delay the import of the records.
@@ -214,7 +215,7 @@ class DelayedBatchOdooImporter(BatchOdooImporter):
     """Delay import of the records."""
     _model_name = None
 
-    def _import_records(self, external_ids):
+    def _import_records(self, external_ids, **kwargs):
         """Delay the import of the records."""
         import_records.delay(
             self.session, self.model._name,
@@ -234,7 +235,7 @@ def import_records(session, model_name, backend_id, external_ids):
     """Import records from an external Odoo server."""
     env = get_environment(session, model_name, backend_id)
     importer = env.get_connector_unit(OdooImporter)
-    _logger.info(
-        u"%s - Importing external record '(%s,%s)'...",
+    _logger.debug(
+        u"%s - DEFAULT Importing external record '(%s,%s)'...",
         env.backend_record.name, model_name, external_ids)
     importer.run(external_ids)

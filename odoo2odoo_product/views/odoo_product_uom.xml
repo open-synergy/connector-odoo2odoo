@@ -17,11 +17,11 @@
             <field name="name">odoo.product.uom.form</field>
             <field name="model">odoo.product.uom</field>
             <field name="arch" type="xml">
-                <form create="false" delete="false">
+                <form>
                     <sheet>
                         <group name="group_1" colspan="4" col="2">
-                            <field name="backend_id" readonly="1"/>
-                            <field name="odoo_id" readonly="1"/>
+                            <field name="backend_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
+                            <field name="odoo_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
                             <field name="external_odoo_id"/>
                             <field name="sync_date" readonly="1"/>
                         </group>
@@ -34,7 +34,7 @@
             <field name="name">odoo.product.uom.tree</field>
             <field name="model">odoo.product.uom</field>
             <field name="arch" type="xml">
-                <tree create="false" delete="false">
+                <tree>
                     <field name="backend_id"/>
                     <field name="odoo_id"/>
                     <field name="external_odoo_id"/>

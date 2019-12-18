@@ -46,7 +46,7 @@ class GenericAPIAdapter(BackendAdapter):
                 self.backend_record.username,
                 self.backend_record.password)
             client.env.context.clear()
-            _logger.info(
+            _logger.debug(
                 "%s - Session open for user %s",
                 self.backend_record.name,
                 self.backend_record.username)
@@ -59,31 +59,34 @@ class GenericAPIAdapter(BackendAdapter):
             raise O2OConnectionError(exc.reason)    # e.g unreachable, timeout
 
     def execute(self, method, *args, **kwargs):
-        binder = self.binder_for(self.model._name)
-        model_name = self.model.fields_get(
-            [binder._openerp_field])[binder._openerp_field]['relation']
-        log = {
-            'model': model_name,
-            'method': method,
-            'args': args,
-            'kwargs': kwargs,
-        }
-        _logger.info("%s - %s", self.backend_record.name, log)
+        if self._external_model:
+            model_name = self._external_model
+        else:
+            model = self.model
+            binder = self.binder_for(model._name)
+            model_name = model.fields_get(
+                [binder._openerp_field])[binder._openerp_field]['relation']
+            log = {
+                'model': model_name,
+                'method': method,
+                'args': args,
+                'kwargs': kwargs,
+            }
+            _logger.debug("%s - %s", self.backend_record.name, log)
+        odoo_model = self.odoo_session.env[model_name]
         try:
-            odoo_model = self.odoo_session.env[model_name]
             data = getattr(odoo_model, method)(*args, **kwargs)
-        except odoorpc.error.RPCError as exc:
-            if exc.info['data']['exception_type'] == 'missing_error':
-                _logger.error(
-                    "%s - ID missing in backend - %s - %s",
-                    self.backend_record.name, log, exc.message)
-                raise IDMissingInBackend
+        except Exception, e:
+            _logger.debug(
+                u"Error when executing: %s",
+                str(e))
             raise
         else:
             return data
 
 
 class GenericCRUDAdapter(GenericAPIAdapter, CRUDAdapter):
+    _external_model = None
     """External Records Adapter for Odoo."""
 
     def search(self, *args, **kwargs):

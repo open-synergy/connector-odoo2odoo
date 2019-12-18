@@ -44,14 +44,14 @@ class SaleOrderSyncDelayedBatchImporter(DelayedBatchOdooImporter):
             record_id, max_retries=0, priority=5)
 
     def run(self, domain=None):
-        if not domain:
-            domain = []
-        record_ids =\
-            self.backend_adapter.search(domain)
-        _logger.debug('search data %s returned %s',
-                     domain, record_ids)
-        for record_id in record_ids:
-            self._import_records(record_id)
+        if domain:
+            record_ids =\
+                self.backend_adapter.search(domain)
+            _logger.info('%s - search data SO %s returned %s',
+                         self.model, domain, record_ids)
+            if record_ids:
+                for record_id in record_ids:
+                    self._import_records(record_id)
 
 @odoo
 class SaleOrderSyncImporter(OdooImporter):

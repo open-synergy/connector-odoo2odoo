@@ -12,9 +12,9 @@
                 <group name="group_import_po2so">
                     <field name="po_partner_id"/>
                     <field name="external_partner_id" invisible="1"/>
-                    <field name="import_po_date_start"/>
-                    <field name="import_po_date_end"/>
-                    <field name="import_additional_domain"/>
+                    <field name="import_po_date_start" invisible="1"/>
+                    <field name="import_po_date_end" invisible="1"/>
+                    <field name="import_additional_domain" placeholder="e.g [('active', '=', True)]"/>
                     <field name="import_po2so_info"/>
                 </group>
             </page>

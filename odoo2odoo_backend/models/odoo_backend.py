@@ -74,8 +74,6 @@ class OdooBackend(models.Model):
         required=True
     )
 
-    """Write By OpenSynergy Indonesia November 2019"""
-    """============================================"""
     @api.multi
     def _compute_allowed_model_ids(self):
         obj_ir_model =\
@@ -85,7 +83,7 @@ class OdooBackend(models.Model):
             try:
                 model_binding_ids =\
                     document.get_model_bindings().values()
-            except:
+            except:  # noqa: E722
                 model_binding_ids = []
 
             criteria = [
@@ -119,7 +117,7 @@ class OdooBackend(models.Model):
     def create(self, values):
         _super = super(OdooBackend, self)
         result = _super.create(values)
-        if self.connection_ok == False:
+        if not self.connection_ok:
             message = "You need to check the connection "\
                       "to activate this server"
             result.write({
@@ -154,7 +152,6 @@ class OdooBackend(models.Model):
                 self.search(criteria)
             if len(check_data) > 0:
                 raise UserError(strWarning)
-    """============================================"""
 
     @api.multi
     @api.depends(
@@ -197,11 +194,12 @@ class OdooBackend(models.Model):
                 self.env.user.name)
             try:
                 self._get_api_adapter()
-            except O2OConnectionError, exc:
+            except O2OConnectionError as exc:
                 return document.write({
                     "connection_ok": False,
                     "active": False,
-                    "connection_info": u"%s\n%s: %s" % (user_info, message, exc),
+                    "connection_info": u"%s\n%s: %s" % (
+                        user_info, message, exc),
                 })
             return document.write({
                 "connection_ok": True,

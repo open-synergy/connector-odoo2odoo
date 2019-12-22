@@ -32,7 +32,6 @@ class IrTranslation(models.Model):
         cleaning values from One2Many fields resulting in a nasty exception
         (i.e. 'odoo_bind_ids' field here).
         """
-        print self.env.context
         if 'odoo_bind_ids' in vals:
             del vals['odoo_bind_ids']
         return super(IrTranslation, self).create(vals)

@@ -4,7 +4,7 @@
 {
     "name": "Odoo2Odoo - Base (ir)",
     "summary": "Sync basic data between Odoo servers (like translations).",
-    "version": "8.0.1.0.0",
+    "version": "8.0.1.0.1",
     "category": "Tools",
     "website": "http://osiell.com/",
     "author": "ABF OSIELL, Odoo Community Association (OCA)",

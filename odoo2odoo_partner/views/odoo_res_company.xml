@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="odoo_res_company_view_search" model="ir.ui.view">
+            <field name="name">odoo.res.company.search</field>
+            <field name="model">odoo.res.company</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group expand="0" string="Group By">
+                        <filter string="Backend" name="backend" context="{'group_by':'backend_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="odoo_res_company_view_form" model="ir.ui.view">
+            <field name="name">odoo.res.company.form</field>
+            <field name="model">odoo.res.company</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group name="group_1" colspan="4" col="2">
+                            <field name="backend_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
+                            <field name="odoo_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}"/>
+                            <field name="external_odoo_id"/>
+                            <field name="sync_date" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="odoo_res_company_view_tree" model="ir.ui.view">
+            <field name="name">odoo.res.company.tree</field>
+            <field name="model">odoo.res.company</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="backend_id"/>
+                    <field name="odoo_id"/>
+                    <field name="external_odoo_id"/>
+                    <field name="sync_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="odoo_res_company_action" model="ir.actions.act_window">
+            <field name="name">Binding: Partner</field>
+            <field name="res_model">odoo.res.company</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="odoo_res_company_view_search"/>
+            <field name="context">{'search_default_backend': 1}</field>
+        </record>
+
+        <menuitem
+            id="odoo_res_company_menu"
+            name="Company"
+            action="odoo_res_company_action"
+            parent="odoo2odoo_backend.menu_binding"
+            sequence="1"/>
+    </data>
+</openerp>

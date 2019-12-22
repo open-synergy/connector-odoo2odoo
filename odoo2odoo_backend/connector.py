@@ -16,7 +16,9 @@ def get_environment(session, model_name, backend_id):
 
 def create_bindings(session, model_name, record_id):
     """Create binding records for all backends."""
-    for backend in session.env['odoo.backend'].search([]):
+    for backend in session.env['odoo.backend'].search(
+        [("active", "=", True)]
+    ):
         create_binding(session, model_name, record_id, backend.id)
 
 

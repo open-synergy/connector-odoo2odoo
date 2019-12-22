@@ -68,3 +68,16 @@ class OdooModelBinder(OdooBinder):
                     binding = getattr(binding, self._openerp_field)
                 return binding
         return binding
+
+    def to_openerp_cross_model(self, external_id, unwrap=False, browse=False):
+        bindings = self.model.with_context(active_test=False).search(
+            [('odoo_id', '=', str(external_id)),
+             ('backend_id', '=', self.backend_record.id)]
+        )
+        if not bindings:
+            return self.model.browse() if browse else None
+        assert len(bindings) == 1, "Several records found: %s" % (bindings,)
+        if unwrap:
+            return bindings.openerp_id if browse else bindings.openerp_id.id
+        else:
+            return bindings if browse else bindings.id

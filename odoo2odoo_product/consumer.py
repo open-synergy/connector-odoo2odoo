@@ -10,7 +10,9 @@ from openerp.addons.odoo2odoo_backend.unit.binder import OdooModelBinder
 from openerp.addons.odoo2odoo_backend.unit.backend_adapter \
     import GenericCRUDAdapter
 from openerp.addons.odoo2odoo_backend.unit.mapper import (
-    OdooImportMapper, OdooExportMapper)
+    OdooExportMapper)
+from openerp.addons.connector.unit.mapper import (
+    ImportMapper)
 from openerp.addons.odoo2odoo_backend.unit.import_synchronizer import (
     OdooImporter, DirectBatchOdooImporter, DelayedBatchOdooImporter)
 from openerp.addons.odoo2odoo_backend.unit.export_synchronizer import (
@@ -67,7 +69,7 @@ class OdooSyncAdapter(GenericCRUDAdapter):
 
 
 @odoo
-class OdooSyncImportMapper(OdooImportMapper):
+class OdooSyncImportMapper(ImportMapper):
     _model_name = BINDINGS.values()
 
 

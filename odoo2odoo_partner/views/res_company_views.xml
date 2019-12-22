@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<record id="res_company_view_form" model="ir.ui.view">
+    <field name="name">res.company.binding.form</field>
+    <field name="model">res.company</field>
+    <field name="inherit_id" ref="base.view_company_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//page[last()]" position="after">
+            <page name="connector" string="Connectors" groups="connector.group_connector_manager">
+                <field name="no_export"/>
+                <label for="no_export"/>
+                <group name="odoo2odoo" string="Odoo2Odoo">
+                    <field name="odoo_bind_ids" nolabel="1"/>
+                </group>
+            </page>
+        </xpath>
+    </field>
+</record>
+
+<record id="odoo_res_company_view_tree" model="ir.ui.view">
+    <field name="name">odoo.res.company.tree</field>
+    <field name="model">odoo.res.company</field>
+    <field name="arch" type="xml">
+        <tree string="Odoo2Odoo Bindings">
+            <field name="backend_id"/>
+            <field name="odoo_id"/>
+            <field name="external_odoo_id"/>
+            <field name="sync_date"/>
+        </tree>
+    </field>
+</record>
+
+</data>
+</openerp>

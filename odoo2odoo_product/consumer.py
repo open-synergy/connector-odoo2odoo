@@ -45,7 +45,17 @@ TRIGGERS = OrderedDict(
 @on_record_create(model_names=BINDINGS.keys())
 @on_record_write(model_names=BINDINGS.keys())
 def on_event_create_bindings(session, model_name, record_id, vals):
-    create_bindings(session, model_name, record_id)
+    obj_model =\
+        session.env[str(model_name)]
+    record_model =\
+        obj_model.search([("id", "=", record_id)])
+    f_no_export =\
+        getattr(record_model, "_no_export_field")
+    if f_no_export:
+        no_export =\
+            record_model.mapped(str(f_no_export))
+    if not no_export[0]:
+        create_bindings(session, model_name, record_id)
 
 
 @on_record_create(model_names=TRIGGERS.values())

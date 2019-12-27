@@ -22,20 +22,28 @@ from openerp.addons.odoo2odoo_backend.backend import odoo
 
 # Data models to synchronize (with their binding model)
 BINDINGS = OrderedDict([
-    ('product.uom.categ', 'odoo.product.uom.categ'),
-    ('product.uom', 'odoo.product.uom'),
-    ('product.category', 'odoo.product.category'),
-    ('product.template', 'odoo.product.template'),
-    ('product.product', 'odoo.product.product'),
+    ("product.uom.categ", "odoo.product.uom.categ"),
+    ("product.uom", "odoo.product.uom"),
+    ("product.category", "odoo.product.category"),
+    ("product.template", "odoo.product.template"),
+    ("product.product", "odoo.product.product"),
+    # ("product.pricelist.type", "odoo.product.pricelist.type"),
+    ("product.pricelist.version", "odoo.product.pricelist.version"),
+    ("product.pricelist.item", "odoo.product.pricelist.item"),
+    ("product.pricelist", "odoo.product.pricelist"),
 ])
 
 # Data models which trigger the synchronization
 TRIGGER_ON = [
-    'product.uom.categ',
-    'product.uom',
-    'product.category',
-    'product.template',
-    'product.product',
+    "product.uom.categ",
+    "product.uom",
+    "product.category",
+    "product.template",
+    "product.product",
+    # "product.pricelist.type",
+    "product.pricelist.version",
+    "product.pricelist.item",
+    "product.pricelist",
 ]
 TRIGGERS = OrderedDict(
     [(key, value) for key, value in BINDINGS.iteritems()
@@ -61,7 +69,7 @@ def on_event_create_bindings(session, model_name, record_id, vals):
 @on_record_create(model_names=TRIGGERS.values())
 @on_record_write(model_names=TRIGGERS.values())
 def delay_export_binding(session, model_name, record_id, vals):
-    if session.env.context.get('connector_no_export'):
+    if session.env.context.get("connector_no_export"):
         return
     export_binding.delay(
         session, model_name, record_id,

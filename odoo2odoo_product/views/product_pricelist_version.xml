@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<record id="product_pricelist_version_form_view" model="ir.ui.view">
+    <field name="name">product.pricelist.version.connector</field>
+    <field name="model">product.pricelist.version</field>
+    <field name="inherit_id" ref="product.product_pricelist_version_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='active']" position="after">
+          <field name="no_export" groups="connector.group_connector_manager"/>
+      </xpath>
+        <xpath expr="//notebook" position="inside">
+          <page name="page_odoo2odoo" string="Odoo2Odoo" groups="connector.group_connector_manager">
+              <group name="odoo2odoo">
+                  <field name="odoo_bind_ids" nolabel="1"/>
+              </group>
+          </page>
+        </xpath>
+    </field>
+</record>
+
+</data>
+</openerp>

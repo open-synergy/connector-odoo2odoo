@@ -28,5 +28,12 @@
         "views/product_template.xml",
         "views/odoo_product_product.xml",
         "views/product_product.xml",
+        "views/odoo_product_pricelist_type.xml",
+        "views/odoo_product_pricelist_version.xml",
+        "views/product_pricelist_version.xml",
+        "views/odoo_product_pricelist_item.xml",
+        "views/product_pricelist_item.xml",
+        "views/odoo_product_pricelist.xml",
+        "views/product_pricelist.xml",
     ],
 }
